@@ -1,0 +1,47 @@
+zerops:
+  - setup: odoo
+    build:
+      buildCommands:
+        - git clone https://github.com/odoo/odoo.git /app/odoo --branch 19.0 --depth 1
+        - mv /odoo.conf /app/odoo.conf
+      deployFiles: /app
+      addToRunPrepare:
+        - /app/requirements.txt
+
+    run:
+      base: ubuntu/python@3.14
+      prepareCommands:
+        - apt-get update
+        - apt-get install -y \
+            ca-certificates \
+            curl \
+            fonts-noto-cjk \
+            gnupg \
+            libssl-dev \
+            node-less \
+            npm \
+            python3-magic \
+            python3-num2words \
+            python3-odf \
+            python3-pdfminer \
+            python3-phonenumbers \
+            python3-pyldap \
+            python3-qrcode \
+            python3-renderpm \
+            python3-setuptools \
+            python3-slugify \
+            python3-vobject \
+            python3-watchdog \
+            python3-xlrd \
+            python3-xlwt \
+            xz-utils \
+            postgresql-client
+
+        - wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb
+        - dpkg -i wkhtmltox_0.12.6.1-3.bookworm_amd64.deb
+        - apt --fix-broken install -y
+
+        - pip install --upgrade pip
+        - pip install -r requirements.txt
+
+      start: python /app/odoo-bin -c /app/odoo.conf
